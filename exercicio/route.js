@@ -3,16 +3,24 @@ const fs = require("fs");
 const requestHandler = (req, res) => {
   const url = req.url;
   const method = req.method;
+
   if (url === "/") {
     res.write("<html>");
     res.write("<head> <title>foda-se</title> </head>");
+    res.write("<body><div><h1>OLAAA</h1></div></body>");
     res.write(
-      "<body><form action='/message' method='POST'><input type='text' name='message'/><button type='submit'>Enviar</button></form></body>"
+      "<body><form action='/create-user' method='POST'><input type='text' name='userName'/><button type='submit'>Enviar</button></form></body>"
     );
     res.write("</html>");
     return res.end();
   }
-  if (url === "/message" && method === "POST") {
+  if (url === "/users") {
+    res.write("<html>");
+    res.write("<head> <title>foda-se</title> </head>");
+    res.write("<body><ul><li>user1</li><li>user2</li></ul></body>");
+    res.write("</html>");
+  }
+  if (url === "/create-user" && method === "POST") {
     const body = [];
     req.on("data", (chunck) => {
       console.log(chunck);
@@ -21,7 +29,7 @@ const requestHandler = (req, res) => {
     req.on("end", () => {
       const parsedBody = Buffer.concat(body).toString();
       const message = parsedBody.split("=")[1];
-      fs.writeFile("message.txt", message, (err) => {
+      fs.writeFile("user-list.txt", message, (err) => {
         res.statusCode = 302;
         res.setHeader("Location", "/");
         return res.end();
