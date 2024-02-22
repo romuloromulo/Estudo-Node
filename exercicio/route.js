@@ -27,8 +27,9 @@ const requestHandler = (req, res) => {
       body.push(chunck);
     });
     req.on("end", () => {
-      const parsedBody = Buffer.concat(body).toString();
-      const message = parsedBody.split("=")[1];
+      const parsedBody = Buffer(body);
+      console.log("AQUI", parsedBody);
+      const message = "a";
       fs.writeFile("user-list.txt", message, (err) => {
         res.statusCode = 302;
         res.setHeader("Location", "/");

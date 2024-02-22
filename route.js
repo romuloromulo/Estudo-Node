@@ -28,6 +28,7 @@ const requestHandler = (req, res) => {
       });
     });
   }
+  n;
 };
 
 module.exports = requestHandler;
