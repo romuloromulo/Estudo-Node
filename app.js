@@ -2,17 +2,12 @@ const http = require("http");
 const express = require("express");
 const app = express();
 
-app.use((req, resp, next) => {
-  console.log("Teste!2");
+app.use((req, res, next) => {
+  console.log("Teste!223");
   next();
 });
-app.use((req, resp, next) => {
-  console.log("Teste!");
-  next();
+app.use((req, res, next) => {
+  res.send(<h1>Minha pica</h1>);
 });
 
-const server = http.createServer(app);
-
-server.listen(3000, () => {
-  console.log("Servidor está ouvindo na porta 3000");
-});
+app.listen(3000);
