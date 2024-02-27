@@ -1,5 +1,4 @@
 const express = require("express");
-const app = express();
 
 app.use("/users", (req, res, next) => {
   res.send("<h1>pagina user</h1>");
