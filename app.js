@@ -1,12 +1,17 @@
 const express = require("express");
+const bodyParser = require("body-parser");
 const app = express();
 
+const adminRoutes = require("./routes/adm");
+const shopRoutes = require("./routes/shop");
+
+app.use(bodyParser.urlencoded({ extended: false }));
+
+app.use("/admin", adminRoutes);
+app.use(shopRoutes);
+
 app.use((req, res, next) => {
-  console.log("Teste!223");
-  next();
-});
-app.use((req, res, next) => {
-  res.send(<h1>Minha pica</h1>);
+  res.status(404).send("<h1>404</h1>");
 });
 
 app.listen(3000);
