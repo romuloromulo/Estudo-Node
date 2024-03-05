@@ -1,9 +1,6 @@
-const path = require("path");
-
 const express = require("express");
 
-const rootDir = require("../04-adding-a-layout-to-handlebars/util/path");
-const adminData = require("../04-adding-a-layout-to-handlebars/routes/admin");
+const adminData = require("./admin");
 
 const router = express.Router();
 
