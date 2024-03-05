@@ -5,5 +5,22 @@
   </head>
   <body>
     <h1><%= pageTitle %></h1>
+
+    <% if (hasUsers) { %>
+    <ul>
+      <% users.forEach(function(user) { %>
+      <li><%= user.name %></li>
+      <% }); %>
+    </ul>
+    <% } else { %>
+    <p>Nenhum usuário encontrado.</p>
+    <% } %>
+
+    <a href="/">Voltar para a página inicial</a>
+
+    <!-- Adiciona um botão para limpar a lista de usuários -->
+    <form action="/users/clear-users" method="POST">
+      <button type="submit">Limpar Lista de Usuários</button>
+    </form>
   </body>
 </html>

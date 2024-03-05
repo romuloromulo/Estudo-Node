@@ -5,6 +5,10 @@ const rootDir = require("../util/path");
 
 const users = [];
 
+function clearUsers() {
+  users.length = 0;
+}
+
 router.get("/", (req, res, next) => {
   res.sendFile(path.join(rootDir, "views", "create-user.html"));
 });
@@ -17,4 +21,5 @@ router.post("/", (req, res, next) => {
 module.exports = {
   router: router,
   users: users,
+  clearUsers: clearUsers,
 };
