@@ -26,8 +26,8 @@ module.exports = class Cart {
         updatedProd = { id: id, qty: 1 };
         cart.products = [...cart.products, updatedProd];
       }
-      cart.totalPrice = cart.totalPrice + productPrice;
-      console.log("cart", cart);
+      cart.totalPrice = cart.totalPrice + +productPrice;
+
       fs.writeFile(p, JSON.stringify(cart), (err) => {
         console.log(err);
       });
