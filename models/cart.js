@@ -12,7 +12,7 @@ const getCartFromFile = (cb) => {
     if (err) {
       cb({ products: [], totalPrice: 0 });
     } else {
-      cb(JSON.parse(fileContent));
+      cb(JSON.parse(fileContent), err);
     }
   });
 };
@@ -56,6 +56,16 @@ module.exports = class Cart {
         updatedCart.totalPrice - productPrice * productQty;
 
       writeCartToFile(updatedCart);
+    });
+  }
+
+  static getCart(cb) {
+    getCartFromFile((cart, err) => {
+      if (err) {
+        cb(null);
+      } else {
+        cb(cart);
+      }
     });
   }
 };
