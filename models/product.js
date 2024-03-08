@@ -12,9 +12,14 @@ const getProductsFromFile = (cb) => {
     if (err) {
       cb([]);
     } else {
-      console.log("PARCONTENT", JSON.parse(fileContent));
       cb(JSON.parse(fileContent));
     }
+  });
+};
+
+const writeFile = (item) => {
+  fs.writeFile(p, JSON.stringify(item), (err) => {
+    console.log(err);
   });
 };
 
@@ -42,9 +47,18 @@ module.exports = class Product {
       } else {
         this.id = Math.random().toString();
         products.push(this);
-        fs.writeFile(p, JSON.stringify(products), (err) => {
-          console.log(err);
-        });
+        writeFile(products);
+      }
+    });
+  }
+
+  static delete(prodId) {
+    getProductsFromFile((products) => {
+      const updatedProducts = products.filter((p) => p.id !== prodId);
+      if (updatedProducts.length !== products.length) {
+        writeFile(updatedProducts);
+      } else {
+        console.log("Product not found.");
       }
     });
   }
