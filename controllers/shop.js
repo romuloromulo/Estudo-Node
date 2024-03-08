@@ -40,6 +40,8 @@ exports.postCart = (req, res, next) => {
   res.redirect("/cart");
 };
 
+exports.deleteCart = (req, res, next) => {};
+
 exports.getCart = (req, res, next) => {
   res.render("shop/cart", {
     path: "/cart",
