@@ -52,16 +52,26 @@ module.exports = class Cart {
         return;
       }
       const updatedCart = { ...JSON.parse(fileContent) };
-      const product = updatedCart.products.find((prod) => prod.id === id);
-      if (!product) {
+      const productIndex = updatedCart.products.findIndex(
+        (prod) => prod.id === id
+      );
+
+      if (productIndex === -1) {
         return;
       }
+
+      const product = updatedCart.products[productIndex];
       const productQty = product.qty;
-      updatedCart.products = updatedCart.products.filter(
-        (prod) => prod.id !== id
-      );
-      updatedCart.totalPrice =
-        updatedCart.totalPrice - productPrice * productQty;
+
+      if (productQty > 1) {
+        // Se houver mais de um produto, apenas diminua a quantidade
+        updatedCart.products[productIndex].qty = productQty - 1;
+        updatedCart.totalPrice -= productPrice;
+      } else {
+        // Se houver apenas um produto, remova-o completamente
+        updatedCart.products.splice(productIndex, 1);
+        updatedCart.totalPrice -= productPrice * productQty;
+      }
 
       writeCartToFile(updatedCart);
     });
