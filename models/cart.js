@@ -1,43 +1,45 @@
 const fs = require("fs");
 const path = require("path");
 
+// Caminho para o arquivo onde o carrinho será armazenado
 const p = path.join(
   path.dirname(process.mainModule.filename),
   "data",
   "cart.json"
 );
 
-const getCartFromFile = (cb) => {
-  fs.readFile(p, (err, fileContent) => {
-    if (err) {
-      cb({ products: [], totalPrice: 0 });
-    } else {
-      cb(JSON.parse(fileContent), err);
-    }
-  });
-};
-
+// Função para escrever o carrinho no arquivo
 const writeCartToFile = (cart) => {
   fs.writeFile(p, JSON.stringify(cart), (err) => {
     if (err) {
-      console.error("Error writing to cart file:", err);
+      console.error("Erro ao escrever no arquivo do carrinho:", err);
     }
   });
 };
 
 module.exports = class Cart {
   static addProduct(id, productPrice) {
-    getCartFromFile((cart) => {
-      const existingProdIndex = cart.products.findIndex((p) => p.id === id);
-      const existingProd = cart.products[existingProdIndex];
-      let updatedProd;
-      if (existingProd) {
-        updatedProd = { ...existingProd };
-        updatedProd.qty = updatedProd.qty + 1;
-        cart.products[existingProdIndex] = updatedProd;
+    // Buscar o carrinho anterior
+    fs.readFile(p, (err, fileContent) => {
+      let cart = { products: [], totalPrice: 0 };
+      if (!err) {
+        cart = JSON.parse(fileContent);
+      }
+      // Analisar o carrinho => Encontrar produto existente
+      const existingProductIndex = cart.products.findIndex(
+        (prod) => prod.id === id
+      );
+      const existingProduct = cart.products[existingProductIndex];
+      let updatedProduct;
+      // Adicionar novo produto / aumentar quantidade
+      if (existingProduct) {
+        updatedProduct = { ...existingProduct };
+        updatedProduct.qty = updatedProduct.qty + 1;
+        cart.products = [...cart.products];
+        cart.products[existingProductIndex] = updatedProduct;
       } else {
-        updatedProd = { id: id, qty: 1 };
-        cart.products.push(updatedProd);
+        updatedProduct = { id: id, qty: 1 };
+        cart.products = [...cart.products, updatedProduct];
       }
       cart.totalPrice = cart.totalPrice + +productPrice;
       writeCartToFile(cart);
@@ -45,9 +47,15 @@ module.exports = class Cart {
   }
 
   static deleteProduct(id, productPrice) {
-    getCartFromFile((cart) => {
-      const updatedCart = { ...cart };
+    fs.readFile(p, (err, fileContent) => {
+      if (err) {
+        return;
+      }
+      const updatedCart = { ...JSON.parse(fileContent) };
       const product = updatedCart.products.find((prod) => prod.id === id);
+      if (!product) {
+        return;
+      }
       const productQty = product.qty;
       updatedCart.products = updatedCart.products.filter(
         (prod) => prod.id !== id
@@ -60,7 +68,8 @@ module.exports = class Cart {
   }
 
   static getCart(cb) {
-    getCartFromFile((cart, err) => {
+    fs.readFile(p, (err, fileContent) => {
+      const cart = JSON.parse(fileContent);
       if (err) {
         cb(null);
       } else {
