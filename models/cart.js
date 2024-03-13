@@ -1,37 +1,27 @@
-const fs = require("fs");
-const path = require("path");
+const fs = require('fs');
+const path = require('path');
 
-// Caminho para o arquivo onde o carrinho será armazenado
 const p = path.join(
   path.dirname(process.mainModule.filename),
-  "data",
-  "cart.json"
+  'data',
+  'cart.json'
 );
-
-// Função para escrever o carrinho no arquivo
-const writeCartToFile = (cart) => {
-  fs.writeFile(p, JSON.stringify(cart), (err) => {
-    if (err) {
-      console.error("Erro ao escrever no arquivo do carrinho:", err);
-    }
-  });
-};
 
 module.exports = class Cart {
   static addProduct(id, productPrice) {
-    // Buscar o carrinho anterior
+    // Fetch the previous cart
     fs.readFile(p, (err, fileContent) => {
       let cart = { products: [], totalPrice: 0 };
       if (!err) {
         cart = JSON.parse(fileContent);
       }
-      // Analisar o carrinho => Encontrar produto existente
+      // Analyze the cart => Find existing product
       const existingProductIndex = cart.products.findIndex(
-        (prod) => prod.id === id
+        prod => prod.id === id
       );
       const existingProduct = cart.products[existingProductIndex];
       let updatedProduct;
-      // Adicionar novo produto / aumentar quantidade
+      // Add new product/ increase quantity
       if (existingProduct) {
         updatedProduct = { ...existingProduct };
         updatedProduct.qty = updatedProduct.qty + 1;
@@ -42,7 +32,9 @@ module.exports = class Cart {
         cart.products = [...cart.products, updatedProduct];
       }
       cart.totalPrice = cart.totalPrice + +productPrice;
-      writeCartToFile(cart);
+      fs.writeFile(p, JSON.stringify(cart), err => {
+        console.log(err);
+      });
     });
   }
 
@@ -52,28 +44,20 @@ module.exports = class Cart {
         return;
       }
       const updatedCart = { ...JSON.parse(fileContent) };
-      const productIndex = updatedCart.products.findIndex(
-        (prod) => prod.id === id
-      );
-
-      if (productIndex === -1) {
-        return;
+      const product = updatedCart.products.find(prod => prod.id === id);
+      if (!product) {
+          return;
       }
-
-      const product = updatedCart.products[productIndex];
       const productQty = product.qty;
+      updatedCart.products = updatedCart.products.filter(
+        prod => prod.id !== id
+      );
+      updatedCart.totalPrice =
+        updatedCart.totalPrice - productPrice * productQty;
 
-      if (productQty > 1) {
-        // Se houver mais de um produto, apenas diminua a quantidade
-        updatedCart.products[productIndex].qty = productQty - 1;
-        updatedCart.totalPrice -= productPrice;
-      } else {
-        // Se houver apenas um produto, remova-o completamente
-        updatedCart.products.splice(productIndex, 1);
-        updatedCart.totalPrice -= productPrice * productQty;
-      }
-
-      writeCartToFile(updatedCart);
+      fs.writeFile(p, JSON.stringify(updatedCart), err => {
+        console.log(err);
+      });
     });
   }
 
