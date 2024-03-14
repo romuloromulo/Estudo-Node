@@ -13,15 +13,15 @@ exports.postAddProduct = async (req, res, next) => {
   const imageUrl = req.body.imageUrl;
   const price = req.body.price;
   const description = req.body.description;
-  const response = await Product.create({
+
+  await req.user.createProduct({
     title: title,
     price: price,
     imageUrl: imageUrl,
     description: description,
   });
-  res.redirect("/admin/products");
 
-  console.log("ADDPRODUCTRESP", response);
+  res.redirect("/admin/products");
 };
 
 exports.getEditProduct = (req, res, next) => {
@@ -30,7 +30,9 @@ exports.getEditProduct = (req, res, next) => {
     return res.redirect("/");
   }
   const prodId = req.params.productId;
-  Product.findByPk(prodId).then((product) => {
+
+  req.user.getProducts({ where: { id: prodId } }).then((products) => {
+    const product = products[0];
     if (!product) {
       return res.redirect("/");
     }
@@ -44,11 +46,13 @@ exports.getEditProduct = (req, res, next) => {
 };
 
 exports.postEditProduct = (req, res, next) => {
-  const prodId = req.body.productId;
-  const updatedTitle = req.body.title;
-  const updatedPrice = req.body.price;
-  const updatedImageUrl = req.body.imageUrl;
-  const updatedDesc = req.body.description;
+  const { productId, title, price, imageUrl, description } = req.body;
+  const prodId = productId;
+  const updatedTitle = title;
+  const updatedPrice = price;
+  const updatedImageUrl = imageUrl;
+  const updatedDesc = description;
+
   Product.findByPk(prodId)
     .then((p) => {
       p.title = updatedTitle;
@@ -62,7 +66,7 @@ exports.postEditProduct = (req, res, next) => {
 };
 
 exports.getProducts = (req, res, next) => {
-  Product.findAll().then((products) => {
+  req.user.getProducts().then((products) => {
     res.render("admin/products", {
       prods: products,
       pageTitle: "Admin Products",
