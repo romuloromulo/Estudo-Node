@@ -79,6 +79,6 @@ exports.postDeleteProduct = async (req, res, next) => {
   const prodId = req.body.productId;
   const product = await Product.findByPk(prodId);
   const response = await product.destroy();
-  console.log(response);
+  // console.log(response);
   res.redirect("/admin/products");
 };

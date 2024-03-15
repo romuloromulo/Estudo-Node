@@ -1,5 +1,6 @@
 const Product = require("../models/product");
 const Cart = require("../models/cart");
+const CartItem = require("../models/cart-item");
 
 exports.getProducts = (req, res, next) => {
   Product.findAll()
@@ -54,7 +55,7 @@ exports.getIndex = (req, res, next) => {
 exports.getCart = async (req, res, next) => {
   const cart = await req.user.getCart();
   const cartProducts = await cart.getProducts();
-  console.log("CARTPRODUCTS", cartProducts);
+  // console.log("CARTPRODUCTS", cartProducts);
 
   res.render("shop/cart", {
     path: "/cart",
@@ -88,16 +89,59 @@ exports.postCart = async (req, res, next) => {
   }
 };
 
+// exports.postCartDeleteProduct = async (req, res, next) => {
+//   try {
+//     const { productId } = req.body;
+//     const cart = await req.user.getCart();
+//     const products = await cart.getProducts({ where: { id: productId } });
+//     const product = products[0];
+//     const { cartItem } = product;
+//     if (cartItem.quantity === 1) {
+//       await product.cartItem.destroy();
+//     }
+//     if (cartItem.quantity > 1) {
+//       cartItem.quantity = cartItem.quantity - 1;
+//     }
+
+//     res.redirect("/cart");
+//   } catch (err) {
+//     console.log("POSTCARTDELETEPRODUCT ERROR", err);
+//   }
+// };
 exports.postCartDeleteProduct = async (req, res, next) => {
   try {
     const { productId } = req.body;
     const cart = await req.user.getCart();
     const products = await cart.getProducts({ where: { id: productId } });
     const product = products[0];
-    await product.cartItem.destroy();
+
+    if (!product) {
+      return res
+        .status(404)
+        .json({ message: "Produto não encontrado no carrinho" });
+    }
+
+    const cartItem = await CartItem.findOne({
+      where: { cartId: cart.id, productId: productId },
+    });
+
+    if (!cartItem) {
+      return res
+        .status(404)
+        .json({ message: "Item do carrinho não encontrado" });
+    }
+
+    if (cartItem.quantity === 1) {
+      await cart.removeProduct(product); // Remova o produto do carrinho
+    } else {
+      cartItem.quantity -= 1; // Diminua a quantidade do produto no carrinho
+      await cartItem.save(); // Salve as alterações na quantidade do produto
+    }
+
     res.redirect("/cart");
   } catch (err) {
     console.log("POSTCARTDELETEPRODUCT ERROR", err);
+    res.status(500).json({ message: "Erro ao deletar produto do carrinho" });
   }
 };
 
