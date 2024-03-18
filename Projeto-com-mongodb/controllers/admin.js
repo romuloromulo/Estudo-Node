@@ -14,7 +14,7 @@ exports.postAddProduct = async (req, res, next) => {
   const price = req.body.price;
   const description = req.body.description;
 
-  await req.user.createProduct({
+  Product.save({
     title: title,
     price: price,
     imageUrl: imageUrl,
