@@ -13,7 +13,22 @@ class Product {
       const db = getDb();
       const resp = await db.collection("products").insertOne(this);
       console.log(resp);
-    } catch (error) {}
+    } catch (error) {
+      console.error("Erro ao salvar produto:", error);
+      throw error;
+    }
+  }
+
+  static async fetchAll() {
+    try {
+      const db = getDb();
+      const products = await db.collection("products").find().toArray();
+      console.log("PRODUTOS", products);
+      return products;
+    } catch (error) {
+      console.error("Erro ao buscar produtos:", error);
+      throw error;
+    }
   }
 }
 

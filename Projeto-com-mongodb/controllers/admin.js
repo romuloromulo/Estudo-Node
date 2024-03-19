@@ -13,15 +13,18 @@ exports.postAddProduct = async (req, res, next) => {
   const imageUrl = req.body.imageUrl;
   const price = req.body.price;
   const description = req.body.description;
+  const product = new Product(title, price, description, imageUrl);
 
-  Product.save({
-    title: title,
-    price: price,
-    imageUrl: imageUrl,
-    description: description,
-  });
-
-  res.redirect("/admin/products");
+  try {
+    // Chame o método save() na instância de Product
+    await product.save();
+    res.redirect("/admin/products");
+  } catch (error) {
+    // Lide com o erro adequadamente
+    console.log(error);
+    // Envie uma resposta de erro
+    res.status(500).send("Erro ao adicionar produto");
+  }
 };
 
 exports.getEditProduct = (req, res, next) => {

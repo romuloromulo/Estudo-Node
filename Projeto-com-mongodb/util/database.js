@@ -1,14 +1,17 @@
-const mongodb = require("mongodb");
-const MongoClient = mongodb.MongoClient;
+const { MongoClient } = require("mongodb");
 
 let _db;
 
 async function connectToMongo(cb) {
   try {
-    const client = await MongoClient.connect(
+    const client = new MongoClient(
       "mongodb+srv://romulovianadev:1pQL5n0ocJQjSRDP@estudonode.sthnf7e.mongodb.net/?retryWrites=true&w=majority&appName=estudonode",
-      { useNewUrlParser: true, useUnifiedTopology: true } // adicionando as opções de conexão
+      {
+        useNewUrlParser: true,
+        useUnifiedTopology: true,
+      }
     );
+    await client.connect();
     console.log("Conexão estabelecida com sucesso!");
     _db = client.db();
     cb();
