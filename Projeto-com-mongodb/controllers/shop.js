@@ -2,41 +2,40 @@ const Product = require("../models/product");
 // const Cart = require("../models/cart");
 // const CartItem = require("../models/cart-item");
 
-// exports.getProducts = (req, res, next) => {
-//   Product.findAll()
-//     .then((products) => {
-//       res.render("shop/product-list", {
-//         prods: products,
-//         pageTitle: "All Products",
-//         path: "/products",
-//       });
-//     })
-//     .catch((err) => {
-//       console.log(err);
-//     });
-// };
+exports.getProducts = async (req, res, next) => {
+  try {
+    const products = await Product.fetchAll();
+    res.render("shop/index", {
+      prods: products,
+      pageTitle: "Shop",
+      path: "/",
+    });
+  } catch (error) {
+    console.log(error);
+  }
+};
 
-// exports.getProduct = (req, res, next) => {
-//   const prodId = req.params.productId;
-//   // Product.findAll({ where: { id: prodId } })
-//   //   .then(products => {
-//   //     res.render('shop/product-detail', {
-//   //       product: products[0],
-//   //       pageTitle: products[0].title,
-//   //       path: '/products'
-//   //     });
-//   //   })
-//   //   .catch(err => console.log(err));
-//   Product.findByPk(prodId)
-//     .then((product) => {
-//       res.render("shop/product-detail", {
-//         product: product,
-//         pageTitle: product.title,
-//         path: "/products",
-//       });
-//     })
-//     .catch((err) => console.log(err));
-// };
+exports.getProductById = async (req, res, next) => {
+  try {
+    const prodId = req.params.productId;
+    const product = await Product.findById(prodId);
+    if (!product) {
+      return res
+        .status(404)
+        .render("404", { pageTitle: "Produto não encontrado" });
+    }
+    res.render("shop/product-detail", {
+      product: product,
+      pageTitle: product.title,
+      path: "/products",
+    });
+  } catch (error) {
+    console.error("Erro ao buscar produto por ID:", error);
+    res
+      .status(500)
+      .render("error/500", { pageTitle: "Erro interno do servidor" });
+  }
+};
 
 exports.getIndex = async (req, res, next) => {
   try {

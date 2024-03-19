@@ -1,4 +1,5 @@
 const { getDb } = require("../util/database");
+const mongodb = require("mongodb");
 
 class Product {
   constructor(title, price, description, imageUrl) {
@@ -27,6 +28,20 @@ class Product {
       return products;
     } catch (error) {
       console.error("Erro ao buscar produtos:", error);
+      throw error;
+    }
+  }
+
+  static async findById(prodId) {
+    try {
+      const db = getDb();
+      const product = await db
+        .collection("products")
+        .findOne({ _id: new mongodb.ObjectId(prodId) });
+      console.log("chamando", product);
+      return product;
+    } catch (error) {
+      console.error("Erro ao buscar produto por ID:", error);
       throw error;
     }
   }
