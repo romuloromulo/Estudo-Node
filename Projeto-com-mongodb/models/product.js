@@ -2,17 +2,24 @@ const { getDb } = require("../util/database");
 const mongodb = require("mongodb");
 
 class Product {
-  constructor(title, price, description, imageUrl) {
+  constructor(title, price, description, imageUrl, id) {
     this.title = title;
     this.price = price;
     this.description = description;
     this.imageUrl = imageUrl;
+    this._id = id;
   }
 
   async save() {
     try {
       const db = getDb();
-      const resp = await db.collection("products").insertOne(this);
+      if (this._id) {
+        await db
+          .collection("products")
+          .updateOne({ _id: new mongodb.ObjectId(this._id) }, { $set: this });
+      } else {
+        await db.collection("products").insertOne(this);
+      }
       console.log(resp);
     } catch (error) {
       console.error("Erro ao salvar produto:", error);
@@ -42,6 +49,20 @@ class Product {
       return product;
     } catch (error) {
       console.error("Erro ao buscar produto por ID:", error);
+      throw error;
+    }
+  }
+
+  static async deleteById(prodId) {
+    try {
+      const db = getDb();
+      const result = await db
+        .collection("products")
+        .deleteOne({ _id: new mongodb.ObjectId(prodId) });
+      console.log("Produto deletado:", result);
+      return result;
+    } catch (error) {
+      console.error("Erro ao deletar produto por ID:", error);
       throw error;
     }
   }
