@@ -7,7 +7,7 @@ class Product {
     this.price = price;
     this.description = description;
     this.imageUrl = imageUrl;
-    this._id = id;
+    this._id = id ? new mongodb.ObjectId(id) : null;
   }
 
   async save() {
@@ -16,11 +16,12 @@ class Product {
       if (this._id) {
         await db
           .collection("products")
-          .updateOne({ _id: new mongodb.ObjectId(this._id) }, { $set: this });
+          .updateOne({ _id: this._id }, { $set: this });
+        console.log("Produto atualizado com sucesso");
       } else {
         await db.collection("products").insertOne(this);
+        console.log("Novo produto criado com sucesso");
       }
-      console.log(resp);
     } catch (error) {
       console.error("Erro ao salvar produto:", error);
       throw error;
