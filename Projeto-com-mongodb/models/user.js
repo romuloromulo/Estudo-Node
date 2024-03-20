@@ -1,15 +1,17 @@
 const { getDb } = require("../util/database");
 const mongodb = require("mongodb");
-const db = getDb();
 
 class User {
-  constructor(name, email) {
+  constructor(name, email, cart, id) {
     this.name = name;
     this.email = email;
+    this.cart = cart;
+    this._id = id;
   }
 
   async save() {
     try {
+      const db = getDb();
       await db.collection("users").insertOne(this);
       console.log("Novo user criado com sucesso");
     } catch (error) {
@@ -18,8 +20,21 @@ class User {
     }
   }
 
+  async addToCart(product) {
+    const cartProduct = this.cart.items.findIndex((p) => p._id === product._id);
+    const updatedCart = { items: [{ ...product, quantity: 1 }] };
+    const db = getDb();
+    return db
+      .collection("users")
+      .updateOne(
+        { id: new ObjectId(this._id) },
+        { $set: { cart: updatedCart } }
+      );
+  }
+
   static async findById(prodId) {
     try {
+      const db = getDb();
       const user = await db
         .collection("users")
         .findOne({ _id: new mongodb.ObjectId(prodId) });

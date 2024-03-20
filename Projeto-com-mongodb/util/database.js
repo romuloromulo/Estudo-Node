@@ -4,17 +4,13 @@ let _db;
 
 async function connectToMongo(cb) {
   try {
-    const client = new MongoClient(
-      "mongodb+srv://romulovianadev:1pQL5n0ocJQjSRDP@estudonode.sthnf7e.mongodb.net/?retryWrites=true&w=majority&appName=estudonode",
-      {
-        useNewUrlParser: true,
-        useUnifiedTopology: true,
-      }
-    );
-    await client.connect();
+    const client = new MongoClient(process.env.DB_URL);
+    const resp = await client.connect();
+    // console.log(resp);
     console.log("Conexão estabelecida com sucesso!");
-    _db = client.db();
+    _db = resp.db();
     cb();
+
     // Faça o que for necessário com o cliente MongoDB aqui
     // Por exemplo: client.db("nomeDoBancoDeDados").collection("nomeDaColecao").find()...
   } catch (error) {
@@ -27,6 +23,7 @@ const getDb = () => {
   if (_db) {
     return _db;
   }
+
   throw "Database não encontrada";
 };
 
