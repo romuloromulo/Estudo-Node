@@ -79,17 +79,7 @@ exports.postCart = async (req, res, next) => {
 exports.postCartDeleteProduct = async (req, res, next) => {
   try {
     const { productId } = req.body;
-    const cart = await req.user.getCart();
-    const products = await cart.getProducts({ where: { id: productId } });
-    const product = products[0];
-    const { cartItem } = product;
-    if (cartItem.quantity === 1) {
-      await product.cartItem.destroy();
-    }
-    if (cartItem.quantity > 1) {
-      cartItem.quantity = cartItem.quantity - 1;
-    }
-
+    await req.user.removeFromCart(productId);
     res.redirect("/cart");
   } catch (err) {
     console.log("POSTCARTDELETEPRODUCT ERROR", err);

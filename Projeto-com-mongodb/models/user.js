@@ -76,9 +76,24 @@ class User {
   }
 
   async removeFromCart(productId) {
-    const updatedCartItems = this.cart.items.filter((item) => {
-      return item.productId.toHexString() !== productId;
+    const cartProductIndex = this.cart.items.findIndex((p) => {
+      return p.productId.toHexString() === productId;
     });
+
+    let newQuantity;
+    const cartItemQuantity = this.cart.items[cartProductIndex].quantity;
+    let updatedCartItems = [...this.cart.items];
+
+    if (cartItemQuantity > 1) {
+      newQuantity = this.cart.items[cartProductIndex].quantity - 1;
+      updatedCartItems[cartProductIndex].quantity = newQuantity;
+    } else {
+      updatedCartItems = this.cart.items.filter((item) => {
+        return item.productId.toHexString() !== productId;
+      });
+    }
+
+    console.log("UPDATEDTECARTITEMS", updatedCartItems);
 
     const updatedCart = {
       items: updatedCartItems,
@@ -99,7 +114,7 @@ class User {
       const user = await db
         .collection("users")
         .findOne({ _id: new ObjectId(prodId) });
-      console.log("chamando", user);
+      // console.log("chamando", user);
       return user;
     } catch (error) {
       console.error("Erro ao buscar user por ID:", error);
