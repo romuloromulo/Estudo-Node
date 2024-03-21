@@ -1,4 +1,5 @@
 const Product = require("../models/product");
+const { getProductById } = require("./shop");
 
 exports.getAddProduct = (req, res, next) => {
   res.render("admin/edit-product", {
@@ -79,5 +80,6 @@ exports.getProducts = async (req, res, next) => {
 exports.postDeleteProduct = async (req, res, next) => {
   const prodId = req.body.productId;
   const product = await Product.deleteById(prodId);
+  req.user.removeFromCart(getProductById);
   res.redirect("/admin/products");
 };

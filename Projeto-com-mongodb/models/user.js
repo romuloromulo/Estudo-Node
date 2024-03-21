@@ -75,13 +75,14 @@ class User {
     });
   }
 
-  async removeFromCart(productId) {
+  removeFromCart(productId) {
     const cartProductIndex = this.cart.items.findIndex((p) => {
       return p.productId.toHexString() === productId;
     });
 
     let newQuantity;
-    const cartItemQuantity = this.cart.items[cartProductIndex].quantity;
+
+    const cartItemQuantity = this.cart.items[cartProductIndex]?.quantity;
     let updatedCartItems = [...this.cart.items];
 
     if (cartItemQuantity > 1) {
@@ -108,6 +109,36 @@ class User {
         { $set: { cart: updatedCart } }
       );
   }
+
+  async addOrder() {
+    const db = getDb();
+
+    const products = await this.getCart();
+
+    const order = {
+      items: products,
+      user: {
+        _id: new ObjectId(this._id),
+        name: this.name,
+      },
+    };
+
+    db.collection("orders").insertOne(order);
+    this.cart = { items: [] };
+    return db
+      .collection("users")
+      .updateOne(
+        { _id: new ObjectId(this._id) },
+        { $set: { cart: { items: [] } } }
+      );
+  }
+
+  async getOrders() {
+    const db = getDb();
+    const orders = await db.collection("orders").find().toArray();
+    return orders;
+  }
+
   static async findById(prodId) {
     try {
       const db = getDb();

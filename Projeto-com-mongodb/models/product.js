@@ -1,5 +1,6 @@
 const { getDb } = require("../util/database");
 const mongodb = require("mongodb");
+const User = require("./user");
 
 class Product {
   constructor(title, price, description, imageUrl, id, userId) {
