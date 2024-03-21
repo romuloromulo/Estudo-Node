@@ -51,13 +51,16 @@ exports.getIndex = async (req, res, next) => {
 };
 
 exports.getCart = async (req, res, next) => {
-  const cartProducts = await req.user.getCart();
-
-  res.render("shop/cart", {
-    path: "/cart",
-    pageTitle: "Your Cart",
-    products: cartProducts,
-  });
+  try {
+    const cartProducts = await req.user.getCart();
+    res.render("shop/cart", {
+      path: "/cart",
+      pageTitle: "Your Cart",
+      products: cartProducts,
+    });
+  } catch (error) {
+    console.log("Erro ao carregar carrinho:", error);
+  }
 };
 
 exports.postCart = async (req, res, next) => {
@@ -66,50 +69,32 @@ exports.postCart = async (req, res, next) => {
     const product = await Product.findById(productId);
     console.log("PRODUTO", product);
     const result = await req.user.addToCart(product);
-
+    res.redirect("/cart");
     console.log("RESULTADO", result);
-
-    // const cart = await req.user.getCart();
-    // const products = await cart.getProducts({ where: { id: prodId } });
-
-    // let product;
-    // if (products.length > 0) {
-    //   product = products[0];
-    // }
-
-    // let newQuantity = 1;
-    // if (product) {
-    //   const oldQuantity = product.cartItem.quantity;
-    //   newQuantity = oldQuantity + newQuantity;
-    // }
-
-    // const productById = await Product.findByPk(prodId);
-    // await cart.addProduct(productById, { through: { quantity: newQuantity } });
-    // res.redirect("/cart");
   } catch (err) {
     console.log("ERROR POST CART", err);
   }
 };
 
-// // exports.postCartDeleteProduct = async (req, res, next) => {
-// //   try {
-// //     const { productId } = req.body;
-// //     const cart = await req.user.getCart();
-// //     const products = await cart.getProducts({ where: { id: productId } });
-// //     const product = products[0];
-// //     const { cartItem } = product;
-// //     if (cartItem.quantity === 1) {
-// //       await product.cartItem.destroy();
-// //     }
-// //     if (cartItem.quantity > 1) {
-// //       cartItem.quantity = cartItem.quantity - 1;
-// //     }
+exports.postCartDeleteProduct = async (req, res, next) => {
+  try {
+    const { productId } = req.body;
+    const cart = await req.user.getCart();
+    const products = await cart.getProducts({ where: { id: productId } });
+    const product = products[0];
+    const { cartItem } = product;
+    if (cartItem.quantity === 1) {
+      await product.cartItem.destroy();
+    }
+    if (cartItem.quantity > 1) {
+      cartItem.quantity = cartItem.quantity - 1;
+    }
 
-// //     res.redirect("/cart");
-// //   } catch (err) {
-// //     console.log("POSTCARTDELETEPRODUCT ERROR", err);
-// //   }
-// // };
+    res.redirect("/cart");
+  } catch (err) {
+    console.log("POSTCARTDELETEPRODUCT ERROR", err);
+  }
+};
 // exports.postCartDeleteProduct = async (req, res, next) => {
 //   try {
 //     const { productId } = req.body;

@@ -21,22 +21,22 @@ class User {
     }
   }
   addToCart(product) {
-    // console.log(
-    //   "PRODUTO ADD TO CART",
-    //   product._id.toString(),
-    //   this.cart.items[4].productId.toHexString()
-    // );
+    //Checando se o cart já possui o produto e se possuir achar o index dele na array de items
     const cartProductIndex = this.cart.items.findIndex((p) => {
       return p.productId.toHexString() === product._id.toString();
     });
 
     let newQuantity = 1;
+    //Declarando uma nova array utilizando uma cópia da original
     const updatedCartItems = [...this.cart.items];
-    // console.log("CARTPRODUCTINDEX", cartProductIndex);
+    //Checando se o cart já possui o produto
     if (cartProductIndex >= 0) {
+      //se sim, então localiza o produto na array original por meio do index adiquirido e incrementa sua quantidade em 1.
       newQuantity = this.cart.items[cartProductIndex].quantity + 1;
+      //faz update da quantidade no produto especifico do carrinho utilizando o index
       updatedCartItems[cartProductIndex].quantity = newQuantity;
     } else {
+      //se nao possui o produto, apenas inserir no carrinho um novo produto
       updatedCartItems.push({
         productId: new ObjectId(product._id),
         quantity: newQuantity,
@@ -75,6 +75,24 @@ class User {
     });
   }
 
+  async removeFromCart(productId) {
+    const updatedCartItems = this.cart.items.filter((item) => {
+      return item.productId.toHexString() !== productId;
+    });
+
+    const updatedCart = {
+      items: updatedCartItems,
+    };
+
+    const db = getDb();
+
+    return db
+      .collection("users")
+      .updateOne(
+        { _id: new ObjectId(this._id) },
+        { $set: { cart: updatedCart } }
+      );
+  }
   static async findById(prodId) {
     try {
       const db = getDb();
