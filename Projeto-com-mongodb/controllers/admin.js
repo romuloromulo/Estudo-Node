@@ -6,6 +6,7 @@ exports.getAddProduct = (req, res, next) => {
     pageTitle: "Add Product",
     path: "/admin/add-product",
     editing: false,
+    isAuthenticated: req.session.user,
   });
 };
 
@@ -20,7 +21,7 @@ exports.postAddProduct = async (req, res, next) => {
     description,
     imageUrl,
     null,
-    req.user._id
+    req.session.user._id
   );
 
   try {
@@ -53,6 +54,7 @@ exports.getEditProduct = async (req, res, next) => {
     path: "/admin/edit-product",
     editing: editMode,
     product: product,
+    isAuthenticated: req.session.user,
   });
 };
 
@@ -71,6 +73,7 @@ exports.getProducts = async (req, res, next) => {
       prods: products,
       pageTitle: "Admin Products",
       path: "/admin/products",
+      isAuthenticated: req.session.user,
     });
   } catch (error) {
     console.log(error);
@@ -80,6 +83,6 @@ exports.getProducts = async (req, res, next) => {
 exports.postDeleteProduct = async (req, res, next) => {
   const prodId = req.body.productId;
   const product = await Product.deleteById(prodId);
-  req.user.removeFromCart(getProductById);
+  req.session.user.removeFromCart(getProductById);
   res.redirect("/admin/products");
 };
