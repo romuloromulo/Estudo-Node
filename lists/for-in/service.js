@@ -7,8 +7,8 @@ function mapearResult(item) {
 async function getPeople(nome) {
   const url = `${URL}/?search=${nome}&format=json`;
   const resp = await axios.get(url);
-
-  return resp.data.results.map(mapearResult);
+  console.log(resp.data.results);
+  return resp.data.results;
 }
 
 getPeople("r2");
