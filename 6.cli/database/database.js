@@ -4,7 +4,7 @@ const readFyleAsync = promisify(readFile);
 
 class Database {
   constructor() {
-    this.NOME_ARQUIVO = "herois.json";
+    this.NOME_ARQUIVO = "./database/herois.json";
   }
 
   async obterArquivos() {
