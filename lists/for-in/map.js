@@ -8,7 +8,3 @@ Array.prototype.myMap = function (callback) {
 
   return mapArray;
 };
-
-const arr = [1, 2, 3, 4, 5, 2, 1];
-
-arr.myMap((res, index) => {});
