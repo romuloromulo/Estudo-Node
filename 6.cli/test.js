@@ -9,6 +9,6 @@ describe("Suite de manipulaçãoe de dados", () => {
     const expected = DEFAULT_ITEM_CADASTRADO;
     const resultado = await db.listar(expected.id); // Chamar o método listar na instância
 
-    ok(resultado, expected);
+    deepEqual(resultado[0], expected);
   });
 });
