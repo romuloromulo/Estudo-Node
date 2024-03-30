@@ -40,6 +40,50 @@ class Database {
       console.log(err);
     }
   }
+  async remover(id) {
+    try {
+      if (!id) {
+        return await this.escreverArquivo();
+      }
+      const dados = await this.obterArquivos();
+
+      // Encontra o índice do item com o ID especificado na lista de dados
+      const index = dados.findIndex((item) => item.id === parseInt(id));
+      if (index === -1) {
+        throw Error("heroi nao existe");
+      }
+      // Remove o item com base no índice encontrado
+      dados.splice(index, 1);
+      // Escreve os dados atualizados no arquivo
+      return await this.escreverArquivo(dados);
+    } catch (err) {
+      console.error("Erro ao remover o item:", err);
+    }
+  }
+
+  async updateArqv(novosdados) {
+    try {
+      // Verifica se o ID fornecido é um número válido
+      if (!novosdados.id || isNaN(parseInt(novosdados.id))) {
+        throw new Error("ID inválido.");
+      }
+
+      let dados = await this.obterArquivos();
+      const index = dados.findIndex(
+        (item) => item.id === parseInt(novosdados.id)
+      );
+      if (index === -1) {
+        throw new Error("Herói não encontrado.");
+      }
+
+      dados[index] = novosdados;
+
+      // Escreve os dados atualizados no arquivo e retorna o resultado da operação
+      return await this.escreverArquivo(dados);
+    } catch (err) {
+      console.error("Erro ao atualizar o herói:", err);
+    }
+  }
 
   async listar(id) {
     const dados = await this.obterArquivos();
