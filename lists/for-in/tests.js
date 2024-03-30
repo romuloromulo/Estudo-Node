@@ -33,4 +33,23 @@ describe("Star Wars Tests", () => {
     const resultado = await getPeople(nomeBase);
     assert.deepEqual(resultado, expected);
   });
+
+  it("deve atualizar um heroi por id", async () => {
+    const db = new Database(); // Criar uma instância da classe Database
+    const novoHeroi = { id: 1, nome: "Superman", poder: "Super força" };
+
+    // Chama o método de atualização
+    const resultado = await db.updateArqv(novoHeroi);
+
+    // Verifica se a atualização foi bem-sucedida
+    ok(resultado.success, "A atualização do herói falhou");
+
+    // Verifica se o resultado contém o herói atualizado
+    const [heroiAtualizado] = await db.listar(novoHeroi.id);
+    deepEqual(
+      heroiAtualizado,
+      novoHeroi,
+      "O herói não foi atualizado corretamente"
+    );
+  });
 });
